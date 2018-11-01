@@ -37,28 +37,44 @@ public class PostfixEvaluator {
 	 * 	a valid expression in Postfix notation
 	 */
 	double eval( ) throws MalformedExpressionException {
-		// TODO: Implement this method.
-		// The code provided here is for illustration only, and
-		// can be deleted when you write your implementation.
-
-		// Using a stack makes it very simple to evaluate the
-		// arithmetic expression.
-		// See http://docs.oracle.com/javase/8/docs/api/java/util/Stack.html
-		
-		// Use the Scanner to get the elements (tokens) in the
-		// arithmetic expression.
 		
 		Scanner scanner = new Scanner(arithmeticExpr);
-		Token currToken = scanner.getToken();
-		
-		// now process the token, etc.
-		// You should read the implementation of the Token class
-		// to determine what methods you can and should use.
-		
-		// It is sufficient to support the four basic operations:
-		// addition, subtraction, multiplication & division.
-		
-		return 0.0;
+
+
+		Stack<Token> toEvaluate = new Stack<>();
+
+		while(!scanner.isEmpty()){
+            Token currToken = scanner.getToken();
+            if(currToken.isDouble()){
+               toEvaluate.add(currToken) ;
+               scanner.eatToken() ;
+            } else if (currToken.isVariable()) {
+                scanner.useToken(currToken.getName());
+                if(toEvaluate.isEmpty() || !toEvaluate.peek().isDouble()){
+                    throw new MalformedExpressionException();
+                }
+               double val1 = toEvaluate.pop().getValue();
+                if(toEvaluate.isEmpty() || !toEvaluate.peek().isDouble()){
+                    throw new MalformedExpressionException();
+                }
+               double val2 = toEvaluate.pop().getValue();
+
+               double result = 0;
+
+                if(currToken.getName().equals("+")){
+                   result = val2 + val1 ;
+                } else if (currToken.getName().equals("-")){
+                    result = val2 - val1 ;
+                } else if(currToken.getName().equals("*")){
+                    result = val2 * val1 ;
+                } else if(currToken.getName().equals("/")){
+                    result = val2 / val1 ;
+                }
+                toEvaluate.add(new Token(result));
+            }
+        }
+
+		return toEvaluate.pop().getValue();
 	}
 	
 }
